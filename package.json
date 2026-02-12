@@ -1,13 +1,17 @@
 {
   "name": "drizzle-transaction-wrapper",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Nested transaction support for Drizzle ORM with decorators, AsyncLocalStorage context propagation, and custom rollback control.",
   "license": "MIT",
   "author": "",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/HiskelKelemework/drizzle-transactional.git"
   },
+  "bugs": {
+    "url": "https://github.com/HiskelKelemework/drizzle-transactional/issues"
+  },
+  "homepage": "https://github.com/HiskelKelemework/drizzle-transactional#readme",
   "keywords": [
     "drizzle",
     "drizzle-orm",
