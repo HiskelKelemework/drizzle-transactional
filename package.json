@@ -1,5 +1,5 @@
 {
-  "name": "drizzle-transactional",
+  "name": "@byteland/drizzle-transactional",
   "version": "0.1.0",
   "description": "Nested transaction support for Drizzle ORM with decorators, AsyncLocalStorage context propagation, and custom rollback control.",
   "license": "MIT",
