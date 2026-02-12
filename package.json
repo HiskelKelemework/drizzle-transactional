@@ -1,6 +1,6 @@
 {
   "name": "drizzle-transaction-wrapper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Nested transaction support for Drizzle ORM with decorators, AsyncLocalStorage context propagation, and custom rollback control.",
   "license": "MIT",
   "author": "",

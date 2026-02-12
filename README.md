@@ -1,4 +1,4 @@
-# drizzle-transactional
+# drizzle-transactional-wrapper
 
 Nested transaction support for [Drizzle ORM](https://orm.drizzle.team/) with decorator and programmatic APIs, `AsyncLocalStorage`-based context propagation, and custom rollback control.
 
@@ -13,11 +13,11 @@ Nested transaction support for [Drizzle ORM](https://orm.drizzle.team/) with dec
 ## Installation
 
 ```bash
-npm install drizzle-transactional
+npm install drizzle-transactional-wrapper
 # or
-pnpm add drizzle-transactional
+pnpm add drizzle-transactional-wrapper
 # or
-yarn add drizzle-transactional
+yarn add drizzle-transactional-wrapper
 ```
 
 ## Quick start
@@ -27,15 +27,11 @@ yarn add drizzle-transactional
 ```ts
 // src/db/transactional.ts
 import { drizzle } from "drizzle-orm/postgres-js";
-import { createDrizzleTransactional, BaseRepository } from "drizzle-transactional";
+import { createDrizzleTransactional, BaseRepository } from "drizzle-transactional-wrapper";
 
 const db = drizzle(sql);
 
-export const {
-  withTransaction,
-  transaction,
-  transactionStorage,
-} = createDrizzleTransactional(db);
+export const { withTransaction, transaction, transactionStorage } = createDrizzleTransactional(db);
 
 // Create a project-level base repository so individual repos
 // don't need to repeat the constructor arguments.
@@ -102,25 +98,25 @@ const order = await withTransaction(async () => {
 Control how transactions interact when calls are nested. Pass `propagation` in the options object of `withTransaction()` or `@transaction()`. Defaults to `REQUIRED`.
 
 ```ts
-import { Propagation } from "drizzle-transactional";
+import { Propagation } from "drizzle-transactional-wrapper";
 ```
 
-| Level            | Existing tx? | Behaviour                                              |
-|------------------|-------------|--------------------------------------------------------|
-| `REQUIRED`       | yes         | Reuse it                                               |
-|                  | no          | Create a new transaction                               |
-| `MANDATORY`      | yes         | Reuse it                                               |
-|                  | no          | **Throw** — caller must already be in a transaction    |
-| `NESTED`         | yes         | Create a savepoint (`tx.transaction()`)                |
-|                  | no          | Create a new transaction (same as `REQUIRED`)          |
-| `NEVER`          | yes         | **Throw** — must not be called within a transaction    |
-|                  | no          | Run non-transactionally                                |
-| `NOT_SUPPORTED`  | yes         | Suspend it, run non-transactionally                    |
-|                  | no          | Run non-transactionally                                |
-| `REQUIRES_NEW`   | yes         | Suspend it, create a **new** independent transaction   |
-|                  | no          | Create a new transaction                               |
-| `SUPPORTS`       | yes         | Reuse it                                               |
-|                  | no          | Run non-transactionally                                |
+| Level           | Existing tx? | Behaviour                                            |
+| --------------- | ------------ | ---------------------------------------------------- |
+| `REQUIRED`      | yes          | Reuse it                                             |
+|                 | no           | Create a new transaction                             |
+| `MANDATORY`     | yes          | Reuse it                                             |
+|                 | no           | **Throw** — caller must already be in a transaction  |
+| `NESTED`        | yes          | Create a savepoint (`tx.transaction()`)              |
+|                 | no           | Create a new transaction (same as `REQUIRED`)        |
+| `NEVER`         | yes          | **Throw** — must not be called within a transaction  |
+|                 | no           | Run non-transactionally                              |
+| `NOT_SUPPORTED` | yes          | Suspend it, run non-transactionally                  |
+|                 | no           | Run non-transactionally                              |
+| `REQUIRES_NEW`  | yes          | Suspend it, create a **new** independent transaction |
+|                 | no           | Create a new transaction                             |
+| `SUPPORTS`      | yes          | Reuse it                                             |
+|                 | no           | Run non-transactionally                              |
 
 ### Examples
 
@@ -297,26 +293,26 @@ Factory that creates transaction utilities bound to a Drizzle database instance.
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `db` | Drizzle database instance | Any instance returned by `drizzle(...)` |
+| Parameter | Type                      | Description                             |
+| --------- | ------------------------- | --------------------------------------- |
+| `db`      | Drizzle database instance | Any instance returned by `drizzle(...)` |
 
 **Returns:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `withTransaction` | `(fn, options?) => Promise<T>` | Execute a function with transaction propagation |
-| `transaction` | `(options?) => MethodDecorator` | Decorator for class methods |
-| `transactionStorage` | `AsyncLocalStorage` | Raw storage — pass to `BaseRepository` subclass constructors |
+| Property             | Type                            | Description                                                  |
+| -------------------- | ------------------------------- | ------------------------------------------------------------ |
+| `withTransaction`    | `(fn, options?) => Promise<T>`  | Execute a function with transaction propagation              |
+| `transaction`        | `(options?) => MethodDecorator` | Decorator for class methods                                  |
+| `transactionStorage` | `AsyncLocalStorage`             | Raw storage — pass to `BaseRepository` subclass constructors |
 
 ### `BaseRepository<TDatabase>`
 
 Abstract base class for repositories. Accepts the database instance and `transactionStorage` via constructor. `this.dbInstance` is transaction-aware.
 
-| Constructor Parameter | Type | Description |
-|-----------------------|------|-------------|
-| `db` | `TDatabase` | Your Drizzle database instance |
-| `transactionStorage` | `AsyncLocalStorage` | The `transactionStorage` from `createDrizzleTransactional` |
+| Constructor Parameter | Type                | Description                                                |
+| --------------------- | ------------------- | ---------------------------------------------------------- |
+| `db`                  | `TDatabase`         | Your Drizzle database instance                             |
+| `transactionStorage`  | `AsyncLocalStorage` | The `transactionStorage` from `createDrizzleTransactional` |
 
 We recommend creating a single project-level base class:
 
@@ -330,22 +326,22 @@ export abstract class AppRepository extends BaseRepository<typeof db> {
 
 ### `Propagation`
 
-| Value            | Description                                                        |
-|------------------|--------------------------------------------------------------------|
-| `REQUIRED`       | Reuse current transaction or create a new one **(default)**        |
-| `MANDATORY`      | Reuse current transaction; throw if none exists                    |
-| `NESTED`         | Create a savepoint in current transaction; or new if none exists   |
-| `NEVER`          | Run non-transactionally; throw if a transaction exists             |
-| `NOT_SUPPORTED`  | Run non-transactionally; suspend current transaction if one exists |
-| `REQUIRES_NEW`   | Always create a new independent transaction                        |
-| `SUPPORTS`       | Reuse current transaction; run non-transactionally if none exists  |
+| Value           | Description                                                        |
+| --------------- | ------------------------------------------------------------------ |
+| `REQUIRED`      | Reuse current transaction or create a new one **(default)**        |
+| `MANDATORY`     | Reuse current transaction; throw if none exists                    |
+| `NESTED`        | Create a savepoint in current transaction; or new if none exists   |
+| `NEVER`         | Run non-transactionally; throw if a transaction exists             |
+| `NOT_SUPPORTED` | Run non-transactionally; suspend current transaction if one exists |
+| `REQUIRES_NEW`  | Always create a new independent transaction                        |
+| `SUPPORTS`      | Reuse current transaction; run non-transactionally if none exists  |
 
 ### `TransactionOptions<T>`
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `propagation` | `Propagation` | `"REQUIRED"` | Transaction propagation level |
-| `shouldRollback` | `(result: T) => boolean` | — | Return `true` to roll back. Result is still returned. |
+| Property         | Type                     | Default      | Description                                           |
+| ---------------- | ------------------------ | ------------ | ----------------------------------------------------- |
+| `propagation`    | `Propagation`            | `"REQUIRED"` | Transaction propagation level                         |
+| `shouldRollback` | `(result: T) => boolean` | —            | Return `true` to roll back. Result is still returned. |
 
 ## How it works
 
